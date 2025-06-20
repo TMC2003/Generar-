@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Procesador de Excel - FastAPI</title>
+    <link rel="stylesheet" href="/static/estilo.css">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Procesador de Excel</h1>
+        <form action="/procesar" method="post" enctype="multipart/form-data">
+            <input type="file" name="archivo" accept=".xlsx" required>
+            <button type="submit">Procesar y Descargar</button>
+        </form>
+    </div>
+</body>
+</html>
