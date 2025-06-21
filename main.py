@@ -9,10 +9,12 @@ from datetime import datetime
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="templates") # Le dice a FastAPI: “Busca las plantillas HTML (como index.html) en la carpeta llamada templates.”
 
+# crear carpetas donde se guardarán archivos temporales en el servidor
 UPLOAD_FOLDER = "uploads"
 PROCESSED_FOLDER = "processed"
+# Crea las carpetas automáticamente (si no existen)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 
