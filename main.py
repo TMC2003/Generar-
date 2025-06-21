@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, UploadFile, File
+from fastapi import FastAPI, Request, UploadFile, File, Form
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -31,6 +31,18 @@ async def mostrar_registro(request: Request):
 @app.post("/registro")
 async def registrar_usuario(username: str = Form(...), password: str = Form(...)):
     usuarios.append({"username" : username, "password" : password})
+    return {"mensaje": f"Usuario {username} registrado correctamente."}
+
+@app.get("/login", response_class=HTMLResponse)
+async def mostrar_login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.post("/login")
+async def login(username: str = Form(...), password: str = Form(...)):
+    for user in usuarios:
+        if user["username"] == username and user["password"] == password:
+            return {"mensaje": f"Bienvenido, (username)!"}
+    return {"error": "Credenciales incorrectas"}
 
 
 
