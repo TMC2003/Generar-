@@ -6,6 +6,8 @@ import pandas as pd
 import os
 from datetime import datetime
 
+usuarios = []
+
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -18,20 +20,31 @@ PROCESSED_FOLDER = "processed"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+@app.get("/", response_class=HTMLResponse) # "/ " (decorador que envia a la ruta raiz), respon... (le dice a fastapi que la respuesta va ser un html y no json)
+async def read_root(request: Request):  # async (funcion ayncrona), read... (nombre de la funcion), reques... (xq jinja2 lo necesita para que funcione la libreria Jinja2Templates)
+    return templates.TemplateResponse("index.html", {"request": request}) # retorna ejecucion de archivo "index.html" ubicada en la carpeta templates
+
+@app.get("/registro", response_class=HTMLResponse)
+async def mostrar_registro(request: Request):
+    return templates.TemplateResponse('registro.html', {"request" : request})
+
+@app.post("/registro")
+async def registrar_usuario(username: str = Form(...), password: str = Form(...)):
+    usuarios.append({"username" : username, "password" : password})
+
+
 
 @app.post("/procesar")
-async def procesar_archivo(archivo: UploadFile = File(...)):
-    nombre_archivo = archivo.filename
-    ruta_subida = os.path.join(UPLOAD_FOLDER, nombre_archivo)
+async def procesar_archivo(archivo: UploadFile = File(...)): # File(...) señala a Fastapi que el dato viene de un formulario
+    nombre_archivo = archivo.filename   # obtiene elnombre del archivo subido
+    ruta_subida = os.path.join(UPLOAD_FOLDER, nombre_archivo) # crea la ruta para subir el archivo de forma temporal a la carpeta del servidor
 
+    # Sube y guarda el archivo en el servidor
     with open(ruta_subida, "wb") as f:
         f.write(await archivo.read())
 
-    try:
-        df = pd.read_excel(ruta_subida)
+    try: # indica ejecutar, pero si falla se va a except (manejo de errores), try y except siempre van juntos.
+        df = pd.read_excel(ruta_subida) # Crea un DataFrame llamado df con los datos del Excel
 
         # Procesamiento (puedes modificar esto)
         if pd.api.types.is_numeric_dtype(df.iloc[:, 0]):
